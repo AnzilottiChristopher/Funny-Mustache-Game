@@ -1,12 +1,155 @@
-<!DOCTYPEjhtml>
-<html>
-<head>
-    <title>Game</title>
-</head>
-<body>
-    <h1>Secret Game</h1>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>The Assembly — Game Lobby</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="noise"></div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/game.js"></script>
-</body>
+        <div class="wrapper">
+            <header class="header">
+                <div class="crown">✦ ✦ ✦</div>
+                <h1>The Assembly</h1>
+                <div class="rule-line">
+                    <span>⸻</span> <em>A Game of Trust &amp; Deception</em>
+                    <span>⸻</span>
+                </div>
+            </header>
+
+            <div class="cards">
+                <!-- CREATE -->
+                <div class="card create">
+                    <div class="card-corner tl"></div>
+                    <div class="card-corner tr"></div>
+                    <div class="card-corner bl"></div>
+                    <div class="card-corner br"></div>
+
+                    <div class="card-header">
+                        <div class="emblem">⚑</div>
+                        <h2>Convene a Session</h2>
+                        <p class="card-sub">
+                            Summon the players and preside as host.
+                        </p>
+                    </div>
+
+                    <div class="fields">
+                        <div class="field">
+                            <label>Your Name</label>
+                            <input
+                                type="text"
+                                placeholder="Enter your alias…"
+                            />
+                        </div>
+
+                        <div class="field">
+                            <label>Session Name</label>
+                            <input
+                                type="text"
+                                placeholder="e.g. The Weimar Circle"
+                            />
+                        </div>
+
+                        <div class="field">
+                            <label>Number of Players</label>
+                            <select>
+                                <option>5 players</option>
+                                <option selected>6 players</option>
+                                <option>7 players</option>
+                                <option>8 players</option>
+                                <option>9 players</option>
+                                <option>10 players</option>
+                            </select>
+                        </div>
+
+                        <div class="code-reveal">
+                            <label>Your Room Code — Share with Allies</label>
+                            <div class="code-box">
+                                <span class="code-value" id="room-code"
+                                    >XKQF·2841</span
+                                >
+                                <button
+                                    class="copy-btn"
+                                    title="Copy to clipboard"
+                                >
+                                    ⧉
+                                </button>
+                            </div>
+                            <p class="code-hint">
+                                Give this to your fellow players so they may
+                                enter.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-create">Convene the Session</button>
+                </div>
+
+                <!-- DIVIDER -->
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-seal">☩</div>
+                    <div class="divider-line"></div>
+                </div>
+
+                <!-- JOIN -->
+                <div class="card join">
+                    <div class="card-corner tl"></div>
+                    <div class="card-corner tr"></div>
+                    <div class="card-corner bl"></div>
+                    <div class="card-corner br"></div>
+
+                    <div class="card-header">
+                        <div class="emblem red">☭</div>
+                        <h2>Enter a Session</h2>
+                        <p class="card-sub">
+                            Present your papers and take your seat.
+                        </p>
+                    </div>
+
+                    <div class="fields">
+                        <div class="online-badge">
+                            <span class="flicker-dot"></span>
+                            <span>12 citizens currently assembled</span>
+                        </div>
+
+                        <div class="field">
+                            <label>Your Name</label>
+                            <input
+                                type="text"
+                                placeholder="Enter your alias…"
+                            />
+                        </div>
+
+                        <div class="field">
+                            <label>Room Code</label>
+                            <input
+                                type="text"
+                                placeholder="e.g. XKQF·2841"
+                                class="code-input"
+                            />
+                        </div>
+                    </div>
+
+                    <button class="btn btn-join">Enter the Session</button>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="footer-rule">✦</div>
+                <p>
+                    <em
+                        >"The fascists know who they are. The liberals do
+                        not."</em
+                    >
+                </p>
+            </footer>
+        </div>
+    </body>
 </html>
