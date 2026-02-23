@@ -2,6 +2,11 @@ const socket = io();
 
 // Buttons that need to be done on load time
 const createRoom = document.getElementById("btnCreate");
+const joinRoom = document.getElementById("btnJoin");
+
+// Which View of the board
+const lobbyView = document.getElementById("lobbyView");
+const boardView = document.getElementById("boardView");
 
 var room = "lobby";
 
@@ -34,16 +39,6 @@ function generateRoomCode() {
     return `${letters4}·${nums4}`;
 }
 
-// ── Set code on page load ─────────────────────────────
-const roomCodeEl = document.getElementById("room-code");
-roomCodeEl.textContent = generateRoomCode();
-
-// ── Extract the raw password (letters+numbers, no dot) ─
-// Call getRoomCode() anywhere in your server.js to read it
-function getRoomCode() {
-    return roomCodeEl.textContent.replace("·", "");
-}
-
 // ── Copy button ───────────────────────────────────────
 document.querySelector(".copy-btn").addEventListener("click", () => {
     const code = getRoomCode(); // or use roomCodeEl.textContent for the dotted version
@@ -58,31 +53,62 @@ document.querySelector(".copy-btn").addEventListener("click", () => {
     });
 });
 
+// Creating a room
 if (createRoom) {
     createRoom.addEventListener("click", () => {
         console.log("Click");
         const sessionName = document.getElementById("sessionName").value.trim();
-        const userName = document.getElementById("playerName").value.trim();
-        const password = getRoomCode();
+        const password = document.getElementById("password").value.trim();
+        const username = document.getElementById("playerName").value.trim();
 
-        if (!sessionName || !userName) {
-            alert("All fields must be filled out.");
+        if (!sessionName || !username) {
+            alert("Session name must be filled");
             return;
         }
         socket.emit("createSession", {
             sessionName,
-            userName,
             password,
         });
     });
 }
 
 // The status of the created session
-socket.on("CreationStatus", (msg) => {
-    if (msg == "200") {
-        window.location.href = `/board.html?room=${sessionName}`;
-    }
+socket.on("CreationStatus", (data) => {
+    showBoard();
+    room = data.sessionName;
 });
+
+// Joining a room
+if (joinRoom) {
+    joinRoom.addEventListener("click", () => {
+        console.log("Click Join button");
+        const username = document.getElementById("join_name").value.trim();
+        const password = document.getElementById("join_password").value.trim();
+
+        if (!username || !password) {
+            alert("Both Fields must be filled");
+        }
+        socket.emit("joinSession", {
+            username,
+            password,
+        });
+    });
+}
+
+// Status of Joining a session
+socket.on("joinSuccess", (data) => {
+    room = data.sessionName;
+    showBoard();
+});
+
+function showBoard() {
+    lobbyView.classList.add("hidden");
+    boardView.classList.remove("hidden");
+}
+function showLobby() {
+    boardView.classList.add("hidden");
+    lobbyView.classList.remove("hidden");
+}
 
 // Important messages
 socket.on("message", (msg) => {

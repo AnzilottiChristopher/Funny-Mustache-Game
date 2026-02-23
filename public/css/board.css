@@ -7,6 +7,10 @@
     padding: 0;
 }
 
+.hidden {
+    display: none;
+}
+
 :root {
     /* Liberal — teal/cerulean like reference */
     --lib: #3a8fa8;

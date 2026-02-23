@@ -7,7 +7,10 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 let rooms = new Map();
-rooms.set("lobby", "none");
+rooms.set("lobby", {
+    password: null,
+    players: [],
+});
 
 // Set static folder
 app.use(express.static("public"));
@@ -26,25 +29,69 @@ io.on("connection", (socket) => {
 
     // broadcast someone disconnected
     socket.on("disconnect", () => {
-        io.emit("message", "A user has left the game");
-        console.log("Player disconnect");
+        //Handle removing players
+        rooms.forEach((room) => {
+            room.players = room.players.filter(
+                (player) => player !== socket.id,
+            );
+        });
+        console.log("Player Disconnected");
     });
 
     // Creating a session
-    socket.on("createSession", ({ sessionName, userName, password }) => {
+    socket.on("createSession", ({ sessionName, password }) => {
         if (rooms.has(sessionName)) {
             socket.emit("message", "Room name already exists");
             return;
         }
-        rooms.set(sessionName, password);
+
+        //Potentially add password length requirements
+
+        rooms.set(sessionName, {
+            password,
+            host: socket.id,
+            players: [],
+            maxPlayers: 10,
+        });
         socket.leave("lobby");
         socket.join(sessionName);
 
-        socket.emit("CreationStatus", "200", sessionName);
+        socket.emit("CreationStatus", {
+            sessionName,
+        });
+    });
+
+    // Joining a session
+    socket.on("joinSession", ({ sessionName, password }) => {
+        const room = rooms.get(sessionName);
+
+        if (!room) {
+            socket.emit("message", "Room does not exist");
+            return;
+        }
+        if (room.password !== password) {
+            socket.emit("message", "Incorrect Password");
+            return;
+        }
+        if (room.players.length >= room.maxPlayers) {
+            socket.emit("message", "Room is full");
+            return;
+        }
+        if (room.players.includes(socket.id)) {
+            return;
+        }
+
+        socket.join(sessionName);
+        room.players.push(socket.id);
+        socket.leave("lobby");
+
+        socket.emit("joinSuccess", {
+            sessionName,
+        });
     });
 });
 
-const PORT = 3000 || process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
     console.log("Server running on port 3000");

@@ -349,7 +349,7 @@ input.code-input {
     font-family: "Cinzel", serif;
     letter-spacing: 0.15em;
     font-size: 15px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
 }
 
 /* ── buttons ── */
