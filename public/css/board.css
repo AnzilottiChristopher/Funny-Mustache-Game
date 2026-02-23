@@ -1,0 +1,690 @@
+/* ══ RESET ══ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* Liberal — teal/cerulean like reference */
+    --lib: #3a8fa8;
+    --lib-mid: #2e7a92;
+    --lib-dark: #1f5a6e;
+    --lib-darker: #163f50;
+    --lib-text: #c8eef8;
+    --lib-dim: rgba(150, 220, 240, 0.55);
+    --lib-slot: rgba(30, 80, 100, 0.7);
+
+    /* Fascist — tomato red like reference */
+    --fas: #c84030;
+    --fas-mid: #a83020;
+    --fas-dark: #7a1a10;
+    --fas-darker: #4a0c08;
+    --fas-text: #f5c8c0;
+    --fas-dim: rgba(245, 180, 165, 0.55);
+    --fas-slot: rgba(80, 10, 5, 0.65);
+
+    --gold: #b8860b;
+    --gold2: #d4a017;
+    --parchment3: #d4c4a0;
+}
+
+/* ══ BASE ══ */
+html,
+body {
+    height: 100%;
+    background: #0e0804;
+    font-family: "IM Fell English", Georgia, serif;
+    color: #f0e8d8;
+    overflow: hidden;
+}
+
+.noise {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 90% 60% at 50% 40%,
+        #3a1a0a 0%,
+        #0e0804 70%
+    );
+    z-index: 0;
+}
+
+/* ══ PAGE ══ */
+.page {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 24px 60px;
+    transform: scale(1.21);
+    transform-origin: center center;
+}
+
+/* ══════════════════════════════
+   BOARD
+══════════════════════════════ */
+.board {
+    position: relative;
+    width: 100%;
+    max-width: 820px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    animation: fadeUp 0.5s ease both;
+}
+
+.liberal-board {
+    animation-delay: 0.05s;
+}
+.fascist-board {
+    animation-delay: 0.15s;
+}
+
+/* ── Liberal board shell ── */
+.liberal-board {
+    background: linear-gradient(
+        175deg,
+        var(--lib) 0%,
+        var(--lib-mid) 40%,
+        var(--lib-dark) 100%
+    );
+    border: 2px solid var(--lib-dark);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Fascist board shell ── */
+.fascist-board {
+    background: linear-gradient(
+        175deg,
+        var(--fas) 0%,
+        var(--fas-mid) 40%,
+        var(--fas-dark) 100%
+    );
+    border: 2px solid var(--fas-darker);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+/* ══ EDGE BORDERS (zigzag feel via repeating gradient) ══ */
+.board-edge {
+    height: 6px;
+    width: 100%;
+}
+
+.lib-edge {
+    background: repeating-linear-gradient(
+        90deg,
+        var(--lib-darker) 0px,
+        var(--lib-darker) 6px,
+        var(--lib-dark) 6px,
+        var(--lib-dark) 12px
+    );
+}
+
+.fas-edge {
+    background: repeating-linear-gradient(
+        90deg,
+        var(--fas-darker) 0px,
+        var(--fas-darker) 6px,
+        var(--fas-dark) 6px,
+        var(--fas-dark) 12px
+    );
+}
+
+.top-edge {
+    border-radius: 2px 2px 0 0;
+}
+.bottom-edge {
+    border-radius: 0 0 2px 2px;
+}
+
+/* ══ SIDE LABELS ══ */
+.side-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    width: 42px;
+}
+
+.left-label {
+    left: -52px;
+}
+.right-label {
+    right: -52px;
+}
+
+.side-label span {
+    font-family: "Cinzel", serif;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    white-space: nowrap;
+}
+
+.lib-side span {
+    color: var(--lib-text);
+    opacity: 0.8;
+}
+.fas-side span {
+    color: var(--fas-text);
+    opacity: 0.8;
+}
+.fas-side .sword {
+    font-size: 18px;
+    opacity: 0.7;
+}
+
+/* ── mini card stack icons ── */
+.side-icon {
+    position: relative;
+    width: 28px;
+    height: 38px;
+}
+
+.mini-card {
+    position: absolute;
+    width: 22px;
+    height: 30px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    left: 50%;
+}
+
+.mini-card::after {
+    content: "✦";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.mini-card {
+    background: rgba(0, 0, 0, 0.35);
+}
+.fas-mc {
+    background: rgba(80, 5, 0, 0.5);
+    border-color: rgba(255, 160, 140, 0.25);
+}
+
+.mc1 {
+    bottom: 0;
+    transform: translateX(-50%) rotate(-4deg);
+    z-index: 3;
+}
+.mc2 {
+    bottom: 3px;
+    transform: translateX(-47%) rotate(2deg);
+    z-index: 2;
+}
+.mc3 {
+    bottom: 6px;
+    transform: translateX(-53%) rotate(-1deg);
+    z-index: 1;
+}
+
+.discarded {
+    transform: translateX(-50%) rotate(-5deg);
+    z-index: 1;
+    opacity: 0.5;
+}
+
+.discard-icon-wrap {
+    width: 28px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+/* ══ BOARD INNER ══ */
+.board-inner {
+    padding: 6px 14px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ══ TITLE BAR ══ */
+.title-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0 4px;
+}
+
+.title-ornament {
+    flex: 1;
+    font-size: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+}
+
+.lib-orn {
+    color: rgba(180, 230, 240, 0.5);
+}
+.fas-orn {
+    color: rgba(200, 100, 80, 0.5);
+    letter-spacing: 0.12em;
+}
+
+.board-name {
+    font-family: "Cinzel Decorative", serif;
+    font-size: clamp(14px, 2vw, 20px);
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.lib-name {
+    color: var(--lib-text);
+}
+.fas-name {
+    color: var(--fas-text);
+}
+
+/* ══ LIBERAL TRACK AREA ══ */
+.track-area {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    min-height: 72px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* dotted dot-grid background on liberal */
+.track-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.12) 1px,
+        transparent 1px
+    );
+    background-size: 10px 10px;
+    pointer-events: none;
+}
+
+.track-slots {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── slot ── */
+.slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.slot-divider {
+    position: absolute;
+    right: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+}
+
+.lib-divider-line {
+    background: rgba(255, 255, 255, 0.15);
+}
+.fas-divider-line {
+    background: rgba(255, 150, 130, 0.15);
+}
+
+/* ── circle slot marker ── */
+.slot-circle {
+    width: clamp(28px, 4vw, 44px);
+    height: clamp(28px, 4vw, 44px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: box-shadow 0.3s;
+}
+
+.lib-circle {
+    border: 2px solid rgba(180, 230, 240, 0.45);
+    background: radial-gradient(
+        circle,
+        rgba(30, 100, 130, 0.6) 0%,
+        rgba(20, 70, 90, 0.8) 100%
+    );
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.fas-circle {
+    border: 2px solid rgba(255, 160, 140, 0.35);
+    background: radial-gradient(
+        circle,
+        rgba(100, 20, 10, 0.7) 0%,
+        rgba(60, 10, 5, 0.85) 100%
+    );
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.fas-win-circle {
+    border-color: rgba(212, 160, 23, 0.55);
+    background: radial-gradient(
+        circle,
+        rgba(100, 20, 10, 0.7) 0%,
+        rgba(50, 8, 4, 0.9) 100%
+    );
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.5),
+        0 0 8px rgba(184, 134, 11, 0.2);
+}
+
+/* enacted states */
+.lib-enacted {
+    background: radial-gradient(circle, #4ab0d0 0%, #1e7090 100%);
+    border-color: rgba(200, 240, 255, 0.7);
+    box-shadow:
+        0 0 14px rgba(60, 160, 200, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.fas-enacted {
+    background: radial-gradient(circle, #e04030 0%, #8a1a10 100%);
+    border-color: rgba(255, 160, 140, 0.7);
+    box-shadow:
+        0 0 14px rgba(200, 40, 20, 0.5),
+        inset 0 1px 0 rgba(255, 200, 180, 0.15);
+}
+
+/* dove motif area */
+.board-motif {
+    width: 120px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 1;
+}
+
+.dove-svg {
+    width: 100px;
+    height: 80px;
+    opacity: 0.6;
+}
+
+/* ══ ELECTION TRACKER ══ */
+.election-tracker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    padding: 5px 12px;
+    flex-wrap: nowrap;
+}
+
+.tracker-label {
+    font-family: "Cinzel", serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--lib-text);
+    opacity: 0.8;
+    line-height: 1.4;
+    white-space: nowrap;
+    margin-right: 4px;
+}
+
+.tracker-pip {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(180, 230, 240, 0.4);
+    background: rgba(20, 70, 95, 0.7);
+    flex-shrink: 0;
+}
+
+.tracker-pip.active {
+    background: #3a8fd4;
+    border-color: rgba(200, 240, 255, 0.8);
+    box-shadow: 0 0 8px rgba(60, 140, 210, 0.6);
+}
+
+.tracker-arrow {
+    font-family: "Cinzel", serif;
+    font-size: 8px;
+    color: var(--lib-dim);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+}
+
+.tracker-endlabel {
+    font-family: "Cinzel", serif;
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--lib-text);
+    opacity: 0.7;
+    line-height: 1.4;
+    margin-left: 4px;
+    white-space: nowrap;
+    border: 1px solid rgba(180, 230, 240, 0.25);
+    padding: 3px 7px;
+    border-radius: 2px;
+}
+
+/* ══ FASCIST TRACK ══ */
+.fas-track-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fas-track-slots {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 150, 130, 0.1);
+    border-radius: 3px;
+    min-height: 56px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* dot grid on fascist too */
+.fas-track-slots::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        circle,
+        rgba(255, 200, 180, 0.1) 1px,
+        transparent 1px
+    );
+    background-size: 10px 10px;
+    pointer-events: none;
+}
+
+.fas-track-slots.track-slots {
+    padding: 8px 10px;
+    gap: 0;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* power descriptions row */
+.power-descs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding: 0 2px;
+}
+
+.power-desc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 2px;
+}
+
+.power-icon {
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.skull-svg {
+    font-size: 22px;
+    color: var(--fas-text);
+    opacity: 0.65;
+}
+
+.power-desc p {
+    font-family: "Cinzel", serif;
+    font-size: 6.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--fas-dim);
+}
+
+/* win condition banner */
+.win-banner {
+    font-family: "Cinzel", serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--fas-text);
+    opacity: 0.7;
+    border: 1px solid rgba(255, 150, 130, 0.2);
+    border-radius: 2px;
+    padding: 3px 8px;
+}
+
+/* chain row */
+.chain-row {
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    color: var(--fas-darker);
+    text-align: center;
+    line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    user-select: none;
+    filter: brightness(0.7);
+}
+
+/* player count footer */
+.player-footer {
+    font-family: "Cinzel", serif;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-align: center;
+    color: var(--fas-text);
+    opacity: 0.65;
+    border: 1px solid rgba(255, 140, 120, 0.2);
+    border-radius: 2px;
+    padding: 3px 8px;
+}
+
+/* ══ PAGE FOOTER ══ */
+.page-footer {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 2;
+    animation: fadeIn 0.6s 0.4s ease both;
+}
+
+.footer-ornament {
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    opacity: 0.38;
+    margin-bottom: 4px;
+}
+
+.page-footer p {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--parchment3);
+    opacity: 0.35;
+    white-space: nowrap;
+}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

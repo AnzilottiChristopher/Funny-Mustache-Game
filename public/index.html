@@ -44,6 +44,7 @@
                             <label>Your Name</label>
                             <input
                                 type="text"
+                                id="playerName"
                                 placeholder="Enter your alias…"
                             />
                         </div>
@@ -52,6 +53,7 @@
                             <label>Session Name</label>
                             <input
                                 type="text"
+                                id="sessionName"
                                 placeholder="e.g. The Weimar Circle"
                             />
                         </div>
@@ -88,7 +90,9 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-create">Convene the Session</button>
+                    <button id="btnCreate" class="btn btn-create">
+                        Convene the Session
+                    </button>
                 </div>
 
                 <!-- DIVIDER -->
@@ -152,4 +156,6 @@
             </footer>
         </div>
     </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/game.js"></script>
 </html>
