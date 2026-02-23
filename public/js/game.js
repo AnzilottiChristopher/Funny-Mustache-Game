@@ -8,6 +8,15 @@ const joinRoom = document.getElementById("btnJoin");
 const lobbyView = document.getElementById("lobbyView");
 const boardView = document.getElementById("boardView");
 
+// Session List
+let selectedSession = null;
+const sessionList = document.getElementById("sessionList");
+const sessionCount = document.getElementById("session-count");
+const pwOverlay = document.getElementById("pwModalOverlay");
+const pwSessionName = document.getElementById("pwSessionName");
+const btnRefresh = document.getElementById("btnRefresh");
+const btnCancelJoin = document.getElementById("btnCancelJoin");
+
 var room = "lobby";
 
 socket.on("connect", () => {
@@ -22,22 +31,6 @@ socket.on("connect_error", () => {
 socket.on("disconnect", () => {
     console.log("Disconnected from server");
 });
-
-// ── Room Code Generation ──────────────────────────────
-function generateRoomCode() {
-    const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I or O (confusing)
-    const digits = "0123456789";
-
-    let letters4 = "";
-    let nums4 = "";
-
-    for (let i = 0; i < 4; i++) {
-        letters4 += letters[Math.floor(Math.random() * letters.length)];
-        nums4 += digits[Math.floor(Math.random() * digits.length)];
-    }
-
-    return `${letters4}·${nums4}`;
-}
 
 // ── Copy button ───────────────────────────────────────
 document.querySelector(".copy-btn").addEventListener("click", () => {
@@ -87,16 +80,81 @@ if (joinRoom) {
 
         if (!username || !password) {
             alert("Both Fields must be filled");
+        } else {
+            socket.emit("joinSession", {
+                sessionName: selectedSession,
+                password,
+            });
         }
-        socket.emit("joinSession", {
-            username,
-            password,
-        });
     });
 }
 
+// Request List of open sessions
+function fetchSessions() {
+    const btn = document.getElementById("btnRefresh");
+    if (btn) {
+        btn.classList.add("spinning");
+        setTimeout(() => btn.classList.remove("spinning"), 500);
+    }
+    socket.emit("getSessions");
+}
+
+// Render Session Rows from server response
+socket.on("sessionList", (sessions) => {
+    sessionList.innerHTML = "";
+
+    if (!sessions || sessions.length === 0) {
+        sessionList.innerHTML = `<div class="session-empty">No sessions found.<br/><em>Be the first to convene.</em></div>`;
+        sessionCount.textContent = "No open sessions";
+        return;
+    }
+
+    sessionCount.textContent = `${sessions.length} session${sessions.length !== 1 ? "s" : ""} open`;
+
+    sessions.forEach(({ name, players, maxPlayers }) => {
+        const row = document.createElement("div");
+        row.className = "session-row";
+        row.innerHTML = `
+            <span class="session-row-name">${name}</span>
+            <span class="session-row-meta">${players}/${maxPlayers}</span>
+            <span class="session-row-enter">›</span>
+        `;
+        row.addEventListener("click", () => openPasswordModal(name));
+        sessionList.appendChild(row);
+    });
+});
+
+// Open the password modal for a chosen session
+function openPasswordModal(name) {
+    selectedSession = name;
+    pwSessionName.textContent = name;
+    document.getElementById("join_password").value = "";
+    pwOverlay.classList.add("open");
+    document.getElementById("join_password").focus();
+}
+
+// Close modal
+function closePasswordModal() {
+    pwOverlay.classList.remove("open");
+    selectedSession = null;
+}
+
+if (btnRefresh) btnRefresh.addEventListener("click", fetchSessions);
+if (btnCancelJoin) btnCancelJoin.addEventListener("click", closePasswordModal);
+
+// Close an overlay click
+if (pwOverlay) {
+    pwOverlay.addEventListener("click", (e) => {
+        if (e.target === pwOverlay) closePasswordModal();
+    });
+}
+
+// fetch on load
+fetchSessions();
+
 // Status of Joining a session
 socket.on("joinSuccess", (data) => {
+    closePasswordModal();
     room = data.sessionName;
     showBoard();
 });

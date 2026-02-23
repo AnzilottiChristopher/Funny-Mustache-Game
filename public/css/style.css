@@ -503,3 +503,216 @@ input.code-input {
         opacity: 1;
     }
 }
+
+/* ══ SESSION LIST ══ */
+.session-list-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.session-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.refresh-btn {
+    background: none;
+    border: 1px solid var(--crimson);
+    color: var(--crimson);
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    transition:
+        opacity 0.2s,
+        transform 0.3s;
+    line-height: 1;
+}
+
+.refresh-btn:hover {
+    opacity: 1;
+}
+.refresh-btn.spinning {
+    transform: rotate(360deg);
+    transition: transform 0.5s ease;
+}
+
+.session-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 120px;
+    max-height: 180px;
+    padding-right: 4px;
+}
+
+/* scrollbar */
+.session-list::-webkit-scrollbar {
+    width: 4px;
+}
+.session-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.session-list::-webkit-scrollbar-thumb {
+    background: rgba(139, 0, 0, 0.3);
+    border-radius: 2px;
+}
+
+.session-empty {
+    font-size: 12px;
+    font-style: italic;
+    color: #b09060;
+    text-align: center;
+    padding: 24px 8px;
+    line-height: 1.8;
+    opacity: 0.7;
+}
+
+/* individual session row */
+.session-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 248, 235, 0.5);
+    border: 1px solid var(--parchment3);
+    border-left: 3px solid var(--crimson);
+    padding: 8px 12px;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        transform 0.1s;
+    gap: 10px;
+}
+
+.session-row:hover {
+    background: rgba(255, 252, 242, 0.9);
+    border-color: var(--crimson);
+    transform: translateX(2px);
+}
+
+.session-row:active {
+    transform: translateX(0);
+}
+
+.session-row-name {
+    font-family: "Cinzel", serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.session-row-meta {
+    font-family: "IM Fell English", serif;
+    font-size: 11px;
+    font-style: italic;
+    color: #7a5530;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.session-row-enter {
+    font-size: 14px;
+    color: var(--crimson);
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+
+/* ══ PASSWORD MODAL ══ */
+.pw-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 5, 0, 0.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.pw-modal-overlay.open {
+    display: flex;
+}
+
+.pw-modal {
+    position: relative;
+    background: var(--card-bg);
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 28px,
+        rgba(180, 150, 100, 0.08) 29px
+    );
+    border-radius: 4px;
+    padding: 32px 28px 26px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.7),
+        inset 0 0 60px rgba(150, 110, 60, 0.06);
+    animation: fadeUp 0.25s ease;
+}
+
+.pw-modal-header {
+    text-align: center;
+}
+
+.pw-session-name {
+    font-family: "Cinzel", serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--crimson);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+
+.pw-sub {
+    font-size: 12px;
+    font-style: italic;
+    color: #5a4020;
+}
+
+.pw-modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-cancel {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--parchment3);
+    background: transparent;
+    font-family: "Cinzel", serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7a5530;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.btn-cancel:hover {
+    background: rgba(180, 150, 100, 0.1);
+    color: var(--ink);
+}

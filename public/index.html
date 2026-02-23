@@ -9,9 +9,10 @@
             rel="stylesheet"
         />
         <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/board.css" />
     </head>
     <body>
-        <!-- MAIN LOBBY VIEW -->
+        <!-- ══ LOBBY VIEW ══ -->
         <div id="lobbyView">
             <div class="noise"></div>
 
@@ -20,7 +21,8 @@
                     <div class="crown">✦ ✦ ✦</div>
                     <h1>The Assembly</h1>
                     <div class="rule-line">
-                        <span>⸻</span> <em>A Game of Trust &amp; Deception</em>
+                        <span>⸻</span>
+                        <em>A Game of Trust &amp; Deception</em>
                         <span>⸻</span>
                     </div>
                 </header>
@@ -77,10 +79,6 @@
                                     >Your Room Code — Share with Allies</label
                                 >
                                 <div class="code-box">
-                                    <!-- 
-                                <span class="code-value" id="room-code"
-                                    >xkqf·2841</span
-                                    > -->
                                     <input
                                         type="text"
                                         id="password"
@@ -128,11 +126,6 @@
                         </div>
 
                         <div class="fields">
-                            <div class="online-badge">
-                                <span class="flicker-dot"></span>
-                                <span>12 citizens currently assembled</span>
-                            </div>
-
                             <div class="field">
                                 <label>Your Name</label>
                                 <input
@@ -142,20 +135,31 @@
                                 />
                             </div>
 
-                            <div class="field">
-                                <label>Room Code</label>
-                                <input
-                                    type="text"
-                                    id="join_password"
-                                    placeholder="e.g. XKQF·2841"
-                                    class="code-input"
-                                />
+                            <!-- Session browser -->
+                            <div class="session-list-wrap">
+                                <div class="session-list-header">
+                                    <div class="online-badge">
+                                        <span class="flicker-dot"></span>
+                                        <span id="session-count"
+                                            >— assembling —</span
+                                        >
+                                    </div>
+                                    <button
+                                        class="refresh-btn"
+                                        id="btnRefresh"
+                                        title="Refresh sessions"
+                                    >
+                                        ↻
+                                    </button>
+                                </div>
+                                <div class="session-list" id="sessionList">
+                                    <div class="session-empty">
+                                        No sessions found.<br />
+                                        <em>Be the first to convene.</em>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <button id="btnJoin" class="btn btn-join">
-                            Enter the Session
-                        </button>
                     </div>
                 </div>
 
@@ -170,292 +174,293 @@
                 </footer>
             </div>
         </div>
-        <!-- GAME VIEW -->
-        <div id="boardView" class=:"hidden">
-            <!doctype html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8" />
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                    <title>The Assembly — Game Board</title>
-                    <link
-                        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap"
-                        rel="stylesheet"
+
+        <!-- ══ PASSWORD MODAL ══ -->
+        <div class="pw-modal-overlay" id="pwModalOverlay">
+            <div class="pw-modal">
+                <div class="card-corner tl"></div>
+                <div class="card-corner tr"></div>
+                <div class="card-corner bl"></div>
+                <div class="card-corner br"></div>
+                <div class="pw-modal-header">
+                    <div class="pw-session-name" id="pwSessionName">—</div>
+                    <p class="pw-sub">Present your credentials to enter.</p>
+                </div>
+                <div class="field">
+                    <label>Room Code</label>
+                    <input
+                        type="text"
+                        id="join_password"
+                        placeholder="e.g. XKQF·2841"
+                        class="code-input"
                     />
-                    <link rel="stylesheet" href="css/board.css" />
-                </head>
-                <body>
-                    <div class="noise"></div>
+                </div>
+                <div class="pw-modal-actions">
+                    <button class="btn btn-join" id="btnJoin">
+                        Enter the Session
+                    </button>
+                    <button class="btn btn-cancel" id="btnCancelJoin">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
 
-                    <div class="page">
-                        <!-- LIBERAL BOARD -->
-                        <div class="board liberal-board">
-                            <!-- sawtooth top border via SVG pattern -->
-                            <div class="board-edge top-edge lib-edge"></div>
+        <!-- ══ BOARD VIEW ══ -->
+        <div id="boardView" class="hidden">
+            <div class="noise"></div>
 
-                            <!-- left side label -->
-                            <div class="side-label left-label lib-side">
-                                <span>D R A W &nbsp; P I L E</span>
-                                <!-- stacked cards icon -->
-                                <div class="side-icon">
-                                    <div class="mini-card mc3"></div>
-                                    <div class="mini-card mc2"></div>
-                                    <div class="mini-card mc1"></div>
-                                </div>
-                            </div>
+            <div class="page">
+                <!-- LIBERAL BOARD -->
+                <div class="board liberal-board">
+                    <div class="board-edge top-edge lib-edge"></div>
 
-                            <!-- right side label -->
-                            <div class="side-label right-label lib-side">
-                                <span>D I S C A R D &nbsp; P I L E</span>
-                                <div class="side-icon discard-icon-wrap">
-                                    <div class="mini-card mc1 discarded"></div>
-                                </div>
-                            </div>
-
-                            <div class="board-inner">
-                                <!-- title bar -->
-                                <div class="title-bar lib-title-bar">
-                                    <div class="title-ornament lib-orn">
-                                        <div class="leaf-row">❧❧❧❧❧❧❧❧❧❧</div>
-                                    </div>
-                                    <h2 class="board-name lib-name">L I B E R A L</h2>
-                                    <div class="title-ornament lib-orn">
-                                        <div class="leaf-row">❧❧❧❧❧❧❧❧❧❧</div>
-                                    </div>
-                                </div>
-
-                                <!-- policy track area -->
-                                <div class="track-area">
-                                    <div class="track-slots">
-                                        <div class="slot lib-slot" data-n="1">
-                                            <div class="slot-circle lib-circle"></div>
-                                            <div
-                                                class="slot-divider lib-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot lib-slot" data-n="2">
-                                            <div class="slot-circle lib-circle"></div>
-                                            <div
-                                                class="slot-divider lib-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot lib-slot" data-n="3">
-                                            <div class="slot-circle lib-circle"></div>
-                                            <div
-                                                class="slot-divider lib-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot lib-slot" data-n="4">
-                                            <div class="slot-circle lib-circle"></div>
-                                            <div
-                                                class="slot-divider lib-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot lib-slot" data-n="5">
-                                            <div class="slot-circle lib-circle"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- dove motif -->
-                                    <div class="board-motif lib-motif">
-                                        <svg
-                                            viewBox="0 0 120 100"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="dove-svg"
-                                        >
-                                            <!-- simplified dove silhouette -->
-                                            <ellipse
-                                                cx="60"
-                                                cy="52"
-                                                rx="28"
-                                                ry="16"
-                                                fill="rgba(100,180,210,0.3)"
-                                            />
-                                            <path
-                                                d="M32 52 Q20 38 38 30 Q50 24 60 36 Q68 28 82 32 Q95 36 88 50 Q80 60 68 56 Q60 52 52 56 Q44 62 32 52Z"
-                                                fill="rgba(100,180,210,0.4)"
-                                                stroke="rgba(100,180,210,0.6)"
-                                                stroke-width="1"
-                                            />
-                                            <!-- wing -->
-                                            <path
-                                                d="M60 36 Q72 20 90 28 Q78 38 68 40Z"
-                                                fill="rgba(100,180,210,0.35)"
-                                                stroke="rgba(100,180,210,0.55)"
-                                                stroke-width="0.8"
-                                            />
-                                            <!-- laurel branches -->
-                                            <path
-                                                d="M20 78 Q30 68 40 72 Q35 80 25 82Z"
-                                                fill="rgba(100,180,210,0.3)"
-                                                stroke="rgba(100,180,210,0.5)"
-                                                stroke-width="0.8"
-                                            />
-                                            <path
-                                                d="M25 82 Q35 72 45 76 Q40 84 30 86Z"
-                                                fill="rgba(100,180,210,0.3)"
-                                                stroke="rgba(100,180,210,0.5)"
-                                                stroke-width="0.8"
-                                            />
-                                            <path
-                                                d="M100 78 Q90 68 80 72 Q85 80 95 82Z"
-                                                fill="rgba(100,180,210,0.3)"
-                                                stroke="rgba(100,180,210,0.5)"
-                                                stroke-width="0.8"
-                                            />
-                                            <path
-                                                d="M95 82 Q85 72 75 76 Q80 84 90 86Z"
-                                                fill="rgba(100,180,210,0.3)"
-                                                stroke="rgba(100,180,210,0.5)"
-                                                stroke-width="0.8"
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <!-- election tracker -->
-                                <div class="election-tracker">
-                                    <div class="tracker-label">Election<br />Tracker</div>
-                                    <div class="tracker-pip active"></div>
-                                    <div class="tracker-arrow">FAIL →</div>
-                                    <div class="tracker-pip"></div>
-                                    <div class="tracker-arrow">FAIL →</div>
-                                    <div class="tracker-pip"></div>
-                                    <div class="tracker-arrow">FAIL →</div>
-                                    <div class="tracker-pip"></div>
-                                    <div class="tracker-endlabel">
-                                        Reveal &amp; Pass<br />Top Policy
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="board-edge bottom-edge lib-edge"></div>
-                        </div>
-
-                        <!-- FASCIST BOARD -->
-                        <div class="board fascist-board">
-                            <div class="board-edge top-edge fas-edge"></div>
-
-                            <div class="board-inner">
-                                <!-- chain border top -->
-                                <div class="chain-row">⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓</div>
-
-                                <!-- title bar -->
-                                <div class="title-bar fas-title-bar">
-                                    <div class="title-ornament fas-orn">————————</div>
-                                    <h2 class="board-name fas-name">F A S C I S T</h2>
-                                    <div class="title-ornament fas-orn">————————</div>
-                                </div>
-
-                                <!-- policy track + powers -->
-                                <div class="fas-track-area">
-                                    <div class="track-slots fas-track-slots">
-                                        <div class="slot fas-slot" data-n="1">
-                                            <div class="slot-circle fas-circle"></div>
-                                            <div
-                                                class="slot-divider fas-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot fas-slot" data-n="2">
-                                            <div class="slot-circle fas-circle"></div>
-                                            <div
-                                                class="slot-divider fas-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot fas-slot peek-slot" data-n="3">
-                                            <div class="slot-circle fas-circle"></div>
-                                            <div
-                                                class="slot-divider fas-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot fas-slot kill-slot" data-n="4">
-                                            <div class="slot-circle fas-circle"></div>
-                                            <div
-                                                class="slot-divider fas-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot fas-slot kill-slot" data-n="5">
-                                            <div class="slot-circle fas-circle"></div>
-                                            <div
-                                                class="slot-divider fas-divider-line"
-                                            ></div>
-                                        </div>
-
-                                        <div class="slot fas-slot win-slot" data-n="6">
-                                            <div
-                                                class="slot-circle fas-circle fas-win-circle"
-                                            ></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- power descriptions -->
-                                    <div class="power-descs">
-                                        <div
-                                            class="power-desc"
-                                            style="grid-column: 1/3"
-                                        ></div>
-                                        <div class="power-desc peek-desc">
-                                            <div class="power-icon">📋</div>
-                                            <p>
-                                                The President examines the top three cards.
-                                            </p>
-                                        </div>
-                                        <div class="power-desc kill-desc">
-                                            <div class="power-icon">🗡</div>
-                                            <p>The President must kill a player.</p>
-                                        </div>
-                                        <div class="power-desc kill-desc">
-                                            <div class="power-icon">🗡</div>
-                                            <p>
-                                                The President must kill a player. Veto power
-                                                is unlocked.
-                                            </p>
-                                        </div>
-                                        <div class="power-desc skull-desc">
-                                            <div class="skull-svg">☠</div>
-                                            <p>Fascists<br />win.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- win condition banner -->
-                                <div class="win-banner">
-                                    FASCISTS WIN IF HITLER IS ELECTED CHANCELLOR
-                                </div>
-
-                                <!-- chain border bottom -->
-                                <div class="chain-row">⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓</div>
-
-                                <!-- player count footer -->
-                                <div class="player-footer">
-                                    5 OR 6 PLAYERS: PLAY WITH 1 FASCIST AND HITLER. HITLER
-                                    KNOWS WHO THE FASCIST IS.
-                                </div>
-                            </div>
-
-                            <div class="board-edge bottom-edge fas-edge"></div>
+                    <div class="side-label left-label lib-side">
+                        <span>D R A W &nbsp; P I L E</span>
+                        <div class="side-icon">
+                            <div class="mini-card mc3"></div>
+                            <div class="mini-card mc2"></div>
+                            <div class="mini-card mc1"></div>
                         </div>
                     </div>
 
-                    <footer class="page-footer">
-                        <div class="footer-ornament">✦</div>
-                        <p>
-                            <em>"The fascists know who they are. The liberals do not."</em>
-                        </p>
-                    </footer>
-                </body>
-            </html>
+                    <div class="side-label right-label lib-side">
+                        <span>D I S C A R D &nbsp; P I L E</span>
+                        <div class="side-icon discard-icon-wrap">
+                            <div class="mini-card mc1 discarded"></div>
+                        </div>
+                    </div>
+
+                    <div class="board-inner">
+                        <div class="title-bar lib-title-bar">
+                            <div class="title-ornament lib-orn">
+                                <div class="leaf-row">❧❧❧❧❧❧❧❧❧❧</div>
+                            </div>
+                            <h2 class="board-name lib-name">L I B E R A L</h2>
+                            <div class="title-ornament lib-orn">
+                                <div class="leaf-row">❧❧❧❧❧❧❧❧❧❧</div>
+                            </div>
+                        </div>
+
+                        <div class="track-area">
+                            <div class="track-slots">
+                                <div class="slot lib-slot" data-n="1">
+                                    <div class="slot-circle lib-circle"></div>
+                                    <div
+                                        class="slot-divider lib-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot lib-slot" data-n="2">
+                                    <div class="slot-circle lib-circle"></div>
+                                    <div
+                                        class="slot-divider lib-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot lib-slot" data-n="3">
+                                    <div class="slot-circle lib-circle"></div>
+                                    <div
+                                        class="slot-divider lib-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot lib-slot" data-n="4">
+                                    <div class="slot-circle lib-circle"></div>
+                                    <div
+                                        class="slot-divider lib-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot lib-slot" data-n="5">
+                                    <div class="slot-circle lib-circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="board-motif lib-motif">
+                                <svg
+                                    viewBox="0 0 120 100"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="dove-svg"
+                                >
+                                    <ellipse
+                                        cx="60"
+                                        cy="52"
+                                        rx="28"
+                                        ry="16"
+                                        fill="rgba(100,180,210,0.3)"
+                                    />
+                                    <path
+                                        d="M32 52 Q20 38 38 30 Q50 24 60 36 Q68 28 82 32 Q95 36 88 50 Q80 60 68 56 Q60 52 52 56 Q44 62 32 52Z"
+                                        fill="rgba(100,180,210,0.4)"
+                                        stroke="rgba(100,180,210,0.6)"
+                                        stroke-width="1"
+                                    />
+                                    <path
+                                        d="M60 36 Q72 20 90 28 Q78 38 68 40Z"
+                                        fill="rgba(100,180,210,0.35)"
+                                        stroke="rgba(100,180,210,0.55)"
+                                        stroke-width="0.8"
+                                    />
+                                    <path
+                                        d="M20 78 Q30 68 40 72 Q35 80 25 82Z"
+                                        fill="rgba(100,180,210,0.3)"
+                                        stroke="rgba(100,180,210,0.5)"
+                                        stroke-width="0.8"
+                                    />
+                                    <path
+                                        d="M25 82 Q35 72 45 76 Q40 84 30 86Z"
+                                        fill="rgba(100,180,210,0.3)"
+                                        stroke="rgba(100,180,210,0.5)"
+                                        stroke-width="0.8"
+                                    />
+                                    <path
+                                        d="M100 78 Q90 68 80 72 Q85 80 95 82Z"
+                                        fill="rgba(100,180,210,0.3)"
+                                        stroke="rgba(100,180,210,0.5)"
+                                        stroke-width="0.8"
+                                    />
+                                    <path
+                                        d="M95 82 Q85 72 75 76 Q80 84 90 86Z"
+                                        fill="rgba(100,180,210,0.3)"
+                                        stroke="rgba(100,180,210,0.5)"
+                                        stroke-width="0.8"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="election-tracker">
+                            <div class="tracker-label">
+                                Election<br />Tracker
+                            </div>
+                            <div class="tracker-pip active"></div>
+                            <div class="tracker-arrow">FAIL →</div>
+                            <div class="tracker-pip"></div>
+                            <div class="tracker-arrow">FAIL →</div>
+                            <div class="tracker-pip"></div>
+                            <div class="tracker-arrow">FAIL →</div>
+                            <div class="tracker-pip"></div>
+                            <div class="tracker-endlabel">
+                                Reveal &amp; Pass<br />Top Policy
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="board-edge bottom-edge lib-edge"></div>
+                </div>
+
+                <!-- FASCIST BOARD -->
+                <div class="board fascist-board">
+                    <div class="board-edge top-edge fas-edge"></div>
+
+                    <div class="board-inner">
+                        <div class="chain-row">
+                            ⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓
+                        </div>
+
+                        <div class="title-bar fas-title-bar">
+                            <div class="title-ornament fas-orn">————————</div>
+                            <h2 class="board-name fas-name">F A S C I S T</h2>
+                            <div class="title-ornament fas-orn">————————</div>
+                        </div>
+
+                        <div class="fas-track-area">
+                            <div class="track-slots fas-track-slots">
+                                <div class="slot fas-slot" data-n="1">
+                                    <div class="slot-circle fas-circle"></div>
+                                    <div
+                                        class="slot-divider fas-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot fas-slot" data-n="2">
+                                    <div class="slot-circle fas-circle"></div>
+                                    <div
+                                        class="slot-divider fas-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot fas-slot peek-slot" data-n="3">
+                                    <div class="slot-circle fas-circle"></div>
+                                    <div
+                                        class="slot-divider fas-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot fas-slot kill-slot" data-n="4">
+                                    <div class="slot-circle fas-circle"></div>
+                                    <div
+                                        class="slot-divider fas-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot fas-slot kill-slot" data-n="5">
+                                    <div class="slot-circle fas-circle"></div>
+                                    <div
+                                        class="slot-divider fas-divider-line"
+                                    ></div>
+                                </div>
+                                <div class="slot fas-slot win-slot" data-n="6">
+                                    <div
+                                        class="slot-circle fas-circle fas-win-circle"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div class="power-descs">
+                                <div
+                                    class="power-desc"
+                                    style="grid-column: 1/3"
+                                ></div>
+                                <div class="power-desc peek-desc">
+                                    <div class="power-icon">📋</div>
+                                    <p>
+                                        The President examines the top three
+                                        cards.
+                                    </p>
+                                </div>
+                                <div class="power-desc kill-desc">
+                                    <div class="power-icon">🗡</div>
+                                    <p>The President must kill a player.</p>
+                                </div>
+                                <div class="power-desc kill-desc">
+                                    <div class="power-icon">🗡</div>
+                                    <p>
+                                        The President must kill a player. Veto
+                                        power is unlocked.
+                                    </p>
+                                </div>
+                                <div class="power-desc skull-desc">
+                                    <div class="skull-svg">☠</div>
+                                    <p>Fascists<br />win.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="win-banner">
+                            FASCISTS WIN IF HITLER IS ELECTED CHANCELLOR
+                        </div>
+
+                        <div class="chain-row">
+                            ⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓⛓
+                        </div>
+
+                        <div class="player-footer">
+                            5 OR 6 PLAYERS: PLAY WITH 1 FASCIST AND HITLER.
+                            HITLER KNOWS WHO THE FASCIST IS.
+                        </div>
+                    </div>
+
+                    <div class="board-edge bottom-edge fas-edge"></div>
+                </div>
+            </div>
+
+            <footer class="page-footer">
+                <div class="footer-ornament">✦</div>
+                <p>
+                    <em
+                        >"The fascists know who they are. The liberals do
+                        not."</em
+                    >
+                </p>
+            </footer>
         </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/game.js"></script>
     </body>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/game.js"></script>
 </html>

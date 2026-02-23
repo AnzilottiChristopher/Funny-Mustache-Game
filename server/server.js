@@ -89,6 +89,21 @@ io.on("connection", (socket) => {
             sessionName,
         });
     });
+
+    // Fetching Session List
+    socket.on("getSessions", () => {
+        const list = [];
+        rooms.forEach((room, name) => {
+            if (name !== "lobby") {
+                list.push({
+                    name,
+                    players: room.players.length,
+                    maxPlayers: room.maxPlayers,
+                });
+            }
+        });
+        socket.emit("sessionList", list);
+    });
 });
 
 const PORT = process.env.PORT || 3000;
