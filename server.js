@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
@@ -13,7 +14,7 @@ rooms.set("lobby", {
 });
 
 // Set static folder
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "client/dist")));
 
 io.on("connection", (socket) => {
     console.log("Player Connected:", socket.id);

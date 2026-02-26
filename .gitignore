@@ -3,3 +3,9 @@ node_modules/
 dis/
 build/
 .prettierrc
+
+client/node_modules/
+client/dist/
+client/.vite/
+client/.env.local
+client/.env
