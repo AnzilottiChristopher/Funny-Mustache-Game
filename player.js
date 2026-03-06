@@ -1,8 +1,10 @@
 class Player {
-    constructor() {
-        this.playerId = null; //TODO figure this out
+    constructor(id, name) {
+        this.username = name;
+        this.playerId = id;
         this.role = null; //Set when the game starts
-        this.life = 1; // Player is alive if 1, dead if 0
+        this.alive = true; // Player is alive if 1, dead if 0
+        this.vote = null; // Who the player votes for
     }
     getPlayerId() {
         return this.playerId;
@@ -11,17 +13,24 @@ class Player {
         return this.role;
     }
     getLife() {
-        return this.life;
+        return this.alive;
+    }
+    getVote() {
+        return this.vote;
     }
 
-    setPlayerId(playerId) {
-        this.playerId = playerId;
-    }
     setRole(role) {
         this.role = role;
     }
     setLife(life) {
         this.life = life;
+    }
+
+    castVote(vote) {
+        this.vote = vote;
+    }
+    resetVote() {
+        this.vote = null;
     }
 }
 

@@ -3,6 +3,7 @@ const GameState = Object.freeze({
     SPECIAL_ABILITY: "special_ability",
     LOBBY: "lobby",
     PRE_MATCH: "pre_match",
+    ROLE_REVEAL: "role_reveal",
 });
 const Phases = Object.freeze({
     NOMINATION: "nomination",
@@ -15,4 +16,4 @@ const Roles = Object.freeze({
     LIBERAL: "liberal",
     HITLER: "hitler",
 })
-module.exports = { GameState, Phases };
+module.exports = { GameState, Phases, Roles };
