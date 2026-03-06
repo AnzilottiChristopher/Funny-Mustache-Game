@@ -1,13 +1,16 @@
-const { GameState, Phases, Roles } = require("./constants");
+const { GameState, Phases, Roles, BoardType } = require("./constants");
 const Player = require("./player");
 
 class GameManager {
-    constructor(playerIds) {
+    constructor(playerIds, boardType) {
         this.players = new Map();
         this.playerOrder = [];
 
         for (const playerData of playerIds) {
-            this.players.set(id, new Player(playerData.id, playerData.name));
+            const player = new Player(playerdata.id, playerData.name);
+
+            this.players.set(playerData.id, player);
+            this.playerOrder.push(playerData.id);
         }
 
         this.state = GameState.PRE_MATCH;
@@ -23,6 +26,8 @@ class GameManager {
         this.discardPile = [];
 
         this.votes = new Map();
+
+        this.boardType = boardType;
     }
     nominateChancellor(playerId) {
         if (this.phase !== Phases.NOMINATION) return;
@@ -78,6 +83,63 @@ class GameManager {
     //TODO
     endGame() {
 
+    }
+
+    //TODO
+    roleAssign() {
+        let roles = [];
+        const playerCount = this.players.size;
+
+        if (this.boardType === BoardType.FIVE) {
+            roles = [
+                Roles.HITLER,
+                Roles.FASCIST,
+                Roles.LIBERAL,
+                Roles.LIBERAL,
+                Roles.LIBERAL
+            ];
+        } else if (this.boardType === BoardType.SEVEN) {
+            roles = [
+                Roles.HITLER,
+                Roles.FASCIST,
+                Roles.FASCIST,
+                Roles.LIBERAL,
+                Roles.LIBERAL,
+                Roles.LIBERAL,
+                Roles.LIBERAL
+            ]
+        } else if (this.boardType === BoardType.NINE) {
+            roles = [
+                Roles.HITLER,
+                Roles.FASCIST,
+                Roles.FASCIST,
+                Roles.FASCIST,
+                Roles.LIBERAL,
+                Roles.LIBERAL,
+                Roles.LIBERAL,
+                Roles.LIBERAL,
+                Roles.LIBERAL
+            ]
+        }
+
+        // Add the extra liberals if needed
+        while (roles.length < playerCount) {
+            roles.push(Roles.LIBERAL);
+        }
+
+        // Shuffling
+        for (let i = roles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+
+            [roles[i], roles[j]] = [roles[j], roles[i]];
+        }
+
+        let index = 0;
+        for (const playerId of this.playerOrder) {
+            const player = this.players.get(playerId);
+            player.setRole(roles[index]);
+            index++;
+        }
     }
 }
 

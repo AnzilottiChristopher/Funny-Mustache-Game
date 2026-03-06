@@ -16,4 +16,9 @@ const Roles = Object.freeze({
     LIBERAL: "liberal",
     HITLER: "hitler",
 })
-module.exports = { GameState, Phases, Roles };
+const BoardType = Object.freeze({
+    FIVE: "five", //Encompasses 5-6 players
+    SEVEN: "seven", // Encompasses 7-8 players
+    NINE: "nine", // Encompasses 9-10 players
+})
+module.exports = { GameState, Phases, Roles, BoardType };
