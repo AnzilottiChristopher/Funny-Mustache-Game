@@ -2,8 +2,8 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
-const { assignRoles } = require("./game/roles");
-const { createGameState } = require("./game/gameState");
+const GameManager = require("./game/gamestate");
+const { BoardType, Roles } = require("./game/constants");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,13 +17,11 @@ rooms.set("lobby", {
     players: [],
 });
 
-// Set static folder
 app.use(express.static(path.join(__dirname, "client/dist")));
 
 io.on("connection", (socket) => {
     console.log("Player Connected:", socket.id);
 
-    // Make players join a lobby room
     socket.on("joinLobby", (roomName, prevRoom) => {
         if (prevRoom != "lobby") {
             socket.leave(prevRoom);
@@ -32,9 +30,7 @@ io.on("connection", (socket) => {
         console.log(socket.id + " joined room: " + roomName);
     });
 
-    // broadcast someone disconnected
     socket.on("disconnect", () => {
-        //Handle removing players
         rooms.forEach((room) => {
             room.players = room.players.filter(
                 (player) => player !== socket.id,
@@ -43,14 +39,11 @@ io.on("connection", (socket) => {
         console.log("Player Disconnected");
     });
 
-    // Creating a session
     socket.on("createSession", ({ sessionName, password, playerName }) => {
         if (rooms.has(sessionName)) {
             socket.emit("message", "Room name already exists");
             return;
         }
-
-        //Potentially add password length requirements
 
         rooms.set(sessionName, {
             password,
@@ -61,13 +54,9 @@ io.on("connection", (socket) => {
         });
         socket.leave("lobby");
         socket.join(sessionName);
-
-        socket.emit("CreationStatus", {
-            sessionName,
-        });
+        socket.emit("CreationStatus", { sessionName });
     });
 
-    // Joining a session
     socket.on("joinSession", ({ sessionName, password, playerName }) => {
         const room = rooms.get(sessionName);
 
@@ -91,13 +80,9 @@ io.on("connection", (socket) => {
         room.players.push(socket.id);
         room.playerNames[socket.id] = playerName;
         socket.leave("lobby");
-
-        socket.emit("joinSuccess", {
-            sessionName,
-        });
+        socket.emit("joinSuccess", { sessionName });
     });
 
-    // Fetching Session List
     socket.on("getSessions", () => {
         const list = [];
         rooms.forEach((room, name) => {
@@ -128,40 +113,51 @@ io.on("connection", (socket) => {
                 "message",
                 `Need at least 5 players to start. Currently have ${room.players.length}.`,
             );
-            return; // ← this return was missing
+            return;
         }
 
         try {
-            const players = room.players.map((id) => ({
+            // Determine board type from player count
+            const count = room.players.length;
+            let boardType;
+            if (count <= 6) boardType = BoardType.FIVE;
+            else if (count <= 8) boardType = BoardType.SEVEN;
+            else boardType = BoardType.NINE;
+
+            // Build players array with names for GameManager
+            const playerData = room.players.map((id) => ({
                 id,
                 name: room.playerNames[id] || id,
             }));
-            const roles = assignRoles(room.players);
-            const state = createGameState(room.players);
-            state.roles = roles;
-            state.president = room.players[0];
-            state.phase = "nomination";
-            gameStates.set(sessionName, state);
 
+            // Create and start the game
+            const game = new GameManager(playerData, boardType);
+            game.startGame();
+            gameStates.set(sessionName, game);
+
+            // Get roles from the game manager
+            const roles = game.getRoles();
+
+            // Tell each player their role privately
             room.players.forEach((playerId) => {
                 const role = roles[playerId];
                 let knownFascists = null;
                 let hitlerId = null;
 
-                if (role === "fascist") {
+                if (role === Roles.FASCIST) {
                     const hitlerSocketId = Object.keys(roles).find(
-                        (id) => roles[id] === "hitler",
+                        (id) => roles[id] === Roles.HITLER,
                     );
                     hitlerId =
                         room.playerNames[hitlerSocketId] || hitlerSocketId;
                     knownFascists = Object.keys(roles)
-                        .filter((id) => roles[id] === "fascist")
+                        .filter((id) => roles[id] === Roles.FASCIST)
                         .map((id) => room.playerNames[id] || id);
                 }
 
-                if (role === "hitler" && room.players.length <= 6) {
+                if (role === Roles.HITLER && room.players.length <= 6) {
                     knownFascists = Object.keys(roles)
-                        .filter((id) => roles[id] === "fascist")
+                        .filter((id) => roles[id] === Roles.FASCIST)
                         .map((id) => room.playerNames[id] || id);
                 }
 
@@ -172,15 +168,17 @@ io.on("connection", (socket) => {
                 });
             });
 
+            // Broadcast game started to whole room
             io.to(sessionName).emit("gameStarted", {
-                president: state.president,
-                players,
+                president: game.getPresident(),
+                players: playerData,
             });
+
             console.log(
                 "gameStarted emitted to room:",
                 sessionName,
                 "players:",
-                players,
+                playerData,
             );
         } catch (err) {
             console.error("startGame error:", err);
@@ -190,7 +188,6 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, () => {
     console.log("Server running on port 3000");
 });
