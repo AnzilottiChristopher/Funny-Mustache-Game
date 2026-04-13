@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SessionList from "./SessionList";
 import PasswordModal from "./PasswordModal";
 import socket from "../socket";
@@ -10,24 +10,36 @@ export default function LobbyView({ onEnterBoard }) {
     const [createPassword, setCreatePassword] = useState("");
     const [playerName, setPlayerName] = useState("");
     const [joinName, setJoinName] = useState("");
+    const [playerCount, setPlayerCount] = useState(6);
+    const playerCountRef = useRef(6);
 
     function fetchSessions() {
-        const btn = document.getElementById("btnRefresh");
-        if (btn) {
-            btn.classList.add("spinning");
-            setTimeout(() => btn.classList.remove("spinning"), 500);
-        }
         socket.emit("getSessions");
     }
 
     useEffect(() => {
         socket.emit("joinLobby", "lobby", "lobby");
         socket.on("sessionList", setSessions);
-        socket.on("CreationStatus", (data) => onEnterBoard(data.sessionName));
+
+        socket.on("CreationStatus", (data) => {
+            onEnterBoard({
+                roomName: data.sessionName,
+                isHost: true,
+                playerCount: playerCountRef.current,
+                myId: socket.id,
+            });
+        });
+
         socket.on("joinSuccess", (data) => {
             setSelectedSession(null);
-            onEnterBoard(data.sessionName);
+            onEnterBoard({
+                roomName: data.sessionName,
+                isHost: false,
+                playerCount: playerCountRef.current,
+                myId: socket.id,
+            });
         });
+
         socket.on("message", (msg) => alert(msg));
         fetchSessions();
 
@@ -39,12 +51,22 @@ export default function LobbyView({ onEnterBoard }) {
         };
     }, []);
 
+    function handlePlayerCountChange(e) {
+        const val = Number(e.target.value);
+        setPlayerCount(val);
+        playerCountRef.current = val;
+    }
+
     function handleCreate() {
         if (!sessionName || !playerName) {
             alert("Session name must be filled");
             return;
         }
-        socket.emit("createSession", { sessionName, password: createPassword });
+        socket.emit("createSession", {
+            sessionName,
+            password: createPassword,
+            playerName,
+        });
     }
 
     function handleCopy() {
@@ -57,12 +79,16 @@ export default function LobbyView({ onEnterBoard }) {
         });
     }
 
-    function handleJoin(password) {
+    function handleJoin(password, name) {
         if (!joinName || !password) {
             alert("Both fields must be filled");
             return;
         }
-        socket.emit("joinSession", { sessionName: selectedSession, password });
+        socket.emit("joinSession", {
+            sessionName: selectedSession,
+            password,
+            playerName: name,
+        });
     }
 
     return (
@@ -124,13 +150,16 @@ export default function LobbyView({ onEnterBoard }) {
 
                                 <div className="field">
                                     <label>Number of Players</label>
-                                    <select>
-                                        <option>5 players</option>
-                                        <option defaultValue>6 players</option>
-                                        <option>7 players</option>
-                                        <option>8 players</option>
-                                        <option>9 players</option>
-                                        <option>10 players</option>
+                                    <select
+                                        value={playerCount}
+                                        onChange={handlePlayerCountChange}
+                                    >
+                                        <option value={5}>5 players</option>
+                                        <option value={6}>6 players</option>
+                                        <option value={7}>7 players</option>
+                                        <option value={8}>8 players</option>
+                                        <option value={9}>9 players</option>
+                                        <option value={10}>10 players</option>
                                     </select>
                                 </div>
 
@@ -228,7 +257,6 @@ export default function LobbyView({ onEnterBoard }) {
                 </div>
             </div>
 
-            {/* ── PASSWORD MODAL ── */}
             {selectedSession && (
                 <PasswordModal
                     sessionName={selectedSession}

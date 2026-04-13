@@ -1,7 +1,82 @@
-export default function BoardView({ room }) {
+import { useState, useEffect } from "react";
+import socket from "../socket";
+import RoleCard from "./RoleCard";
+import PlayerRow from "./PlayerRow";
+
+export default function BoardView({
+    room,
+    isHost,
+    playerCount,
+    role,
+    knownFascists,
+    hitlerId,
+    players,
+    myId,
+    presidentId,
+    onRoleAssigned,
+    onGameStarted,
+}) {
+    const [showRole, setShowRole] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
+    const [chancellorId, setChancellorId] = useState(null);
+
+    useEffect(() => {
+        socket.on("roleAssigned", (data) => {
+            onRoleAssigned(data);
+            setShowRole(true);
+        });
+
+        socket.on("gameStarted", (data) => {
+            console.log("gameStarted received:", data);
+            onGameStarted(data);
+            setGameStarted(true);
+        });
+
+        return () => {
+            socket.off("roleAssigned");
+            socket.off("gameStarted");
+        };
+    }, []);
+
+    function handleStartGame() {
+        socket.emit("startGame", { sessionName: room });
+    }
+
     return (
         <div id="boardView">
             <div className="noise"></div>
+
+            {/* ── ROLE CARD OVERLAY ── */}
+            {showRole && role && (
+                <RoleCard
+                    role={role}
+                    knownFascists={knownFascists}
+                    hitlerId={hitlerId}
+                    onDismiss={() => setShowRole(false)}
+                />
+            )}
+
+            {/* ── START GAME BUTTON (host only, before game starts) ── */}
+            {isHost && !gameStarted && (
+                <div className="start-game-wrap">
+                    <button
+                        className="btn btn-create start-game-btn"
+                        onClick={handleStartGame}
+                    >
+                        Begin the Assembly
+                    </button>
+                </div>
+            )}
+
+            {/* ── PLAYER ROW ── */}
+            {gameStarted && players.length > 0 && (
+                <PlayerRow
+                    players={players}
+                    presidentId={presidentId}
+                    chancellorId={chancellorId}
+                    myId={myId}
+                />
+            )}
 
             <div className="page">
                 {/* ── LIBERAL BOARD ── */}
@@ -39,25 +114,18 @@ export default function BoardView({ room }) {
 
                         <div className="track-area">
                             <div className="track-slots">
-                                <div className="slot lib-slot" data-n="1">
-                                    <div className="slot-circle lib-circle"></div>
-                                    <div className="slot-divider lib-divider-line"></div>
-                                </div>
-                                <div className="slot lib-slot" data-n="2">
-                                    <div className="slot-circle lib-circle"></div>
-                                    <div className="slot-divider lib-divider-line"></div>
-                                </div>
-                                <div className="slot lib-slot" data-n="3">
-                                    <div className="slot-circle lib-circle"></div>
-                                    <div className="slot-divider lib-divider-line"></div>
-                                </div>
-                                <div className="slot lib-slot" data-n="4">
-                                    <div className="slot-circle lib-circle"></div>
-                                    <div className="slot-divider lib-divider-line"></div>
-                                </div>
-                                <div className="slot lib-slot" data-n="5">
-                                    <div className="slot-circle lib-circle"></div>
-                                </div>
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                    <div
+                                        className="slot lib-slot"
+                                        data-n={n}
+                                        key={n}
+                                    >
+                                        <div className="slot-circle lib-circle"></div>
+                                        {n < 5 && (
+                                            <div className="slot-divider lib-divider-line"></div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="board-motif lib-motif">
@@ -173,35 +241,16 @@ export default function BoardView({ room }) {
 
                         <div className="fas-track-area">
                             <div className="track-slots fas-track-slots">
-                                <div className="slot fas-slot" data-n="1">
-                                    <div className="slot-circle fas-circle"></div>
-                                    <div className="slot-divider fas-divider-line"></div>
-                                </div>
-                                <div className="slot fas-slot" data-n="2">
-                                    <div className="slot-circle fas-circle"></div>
-                                    <div className="slot-divider fas-divider-line"></div>
-                                </div>
-                                <div
-                                    className="slot fas-slot peek-slot"
-                                    data-n="3"
-                                >
-                                    <div className="slot-circle fas-circle"></div>
-                                    <div className="slot-divider fas-divider-line"></div>
-                                </div>
-                                <div
-                                    className="slot fas-slot kill-slot"
-                                    data-n="4"
-                                >
-                                    <div className="slot-circle fas-circle"></div>
-                                    <div className="slot-divider fas-divider-line"></div>
-                                </div>
-                                <div
-                                    className="slot fas-slot kill-slot"
-                                    data-n="5"
-                                >
-                                    <div className="slot-circle fas-circle"></div>
-                                    <div className="slot-divider fas-divider-line"></div>
-                                </div>
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                    <div
+                                        className={`slot fas-slot ${n === 3 ? "peek-slot" : ""} ${n >= 4 ? "kill-slot" : ""}`}
+                                        data-n={n}
+                                        key={n}
+                                    >
+                                        <div className="slot-circle fas-circle"></div>
+                                        <div className="slot-divider fas-divider-line"></div>
+                                    </div>
+                                ))}
                                 <div
                                     className="slot fas-slot win-slot"
                                     data-n="6"

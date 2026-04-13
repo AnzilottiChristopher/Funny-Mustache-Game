@@ -2,12 +2,16 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
+const { assignRoles } = require("./game/roles");
+const { createGameState } = require("./game/gameState");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 let rooms = new Map();
+let gameStates = new Map();
+
 rooms.set("lobby", {
     password: null,
     players: [],
@@ -40,7 +44,7 @@ io.on("connection", (socket) => {
     });
 
     // Creating a session
-    socket.on("createSession", ({ sessionName, password }) => {
+    socket.on("createSession", ({ sessionName, password, playerName }) => {
         if (rooms.has(sessionName)) {
             socket.emit("message", "Room name already exists");
             return;
@@ -51,7 +55,8 @@ io.on("connection", (socket) => {
         rooms.set(sessionName, {
             password,
             host: socket.id,
-            players: [],
+            players: [socket.id],
+            playerNames: { [socket.id]: playerName },
             maxPlayers: 10,
         });
         socket.leave("lobby");
@@ -63,7 +68,7 @@ io.on("connection", (socket) => {
     });
 
     // Joining a session
-    socket.on("joinSession", ({ sessionName, password }) => {
+    socket.on("joinSession", ({ sessionName, password, playerName }) => {
         const room = rooms.get(sessionName);
 
         if (!room) {
@@ -84,6 +89,7 @@ io.on("connection", (socket) => {
 
         socket.join(sessionName);
         room.players.push(socket.id);
+        room.playerNames[socket.id] = playerName;
         socket.leave("lobby");
 
         socket.emit("joinSuccess", {
@@ -104,6 +110,82 @@ io.on("connection", (socket) => {
             }
         });
         socket.emit("sessionList", list);
+    });
+
+    socket.on("startGame", ({ sessionName }) => {
+        const room = rooms.get(sessionName);
+
+        if (!room) {
+            socket.emit("message", "Room not found");
+            return;
+        }
+        if (room.host !== socket.id) {
+            socket.emit("message", "Only the host can start the game");
+            return;
+        }
+        if (room.players.length < 5) {
+            socket.emit(
+                "message",
+                `Need at least 5 players to start. Currently have ${room.players.length}.`,
+            );
+            return; // ← this return was missing
+        }
+
+        try {
+            const players = room.players.map((id) => ({
+                id,
+                name: room.playerNames[id] || id,
+            }));
+            const roles = assignRoles(room.players);
+            const state = createGameState(room.players);
+            state.roles = roles;
+            state.president = room.players[0];
+            state.phase = "nomination";
+            gameStates.set(sessionName, state);
+
+            room.players.forEach((playerId) => {
+                const role = roles[playerId];
+                let knownFascists = null;
+                let hitlerId = null;
+
+                if (role === "fascist") {
+                    const hitlerSocketId = Object.keys(roles).find(
+                        (id) => roles[id] === "hitler",
+                    );
+                    hitlerId =
+                        room.playerNames[hitlerSocketId] || hitlerSocketId;
+                    knownFascists = Object.keys(roles)
+                        .filter((id) => roles[id] === "fascist")
+                        .map((id) => room.playerNames[id] || id);
+                }
+
+                if (role === "hitler" && room.players.length <= 6) {
+                    knownFascists = Object.keys(roles)
+                        .filter((id) => roles[id] === "fascist")
+                        .map((id) => room.playerNames[id] || id);
+                }
+
+                io.to(playerId).emit("roleAssigned", {
+                    role,
+                    knownFascists,
+                    hitlerId,
+                });
+            });
+
+            io.to(sessionName).emit("gameStarted", {
+                president: state.president,
+                players,
+            });
+            console.log(
+                "gameStarted emitted to room:",
+                sessionName,
+                "players:",
+                players,
+            );
+        } catch (err) {
+            console.error("startGame error:", err);
+            socket.emit("message", "Failed to start game: " + err.message);
+        }
     });
 });
 
