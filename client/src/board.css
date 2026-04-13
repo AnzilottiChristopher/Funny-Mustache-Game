@@ -907,6 +907,460 @@ body::before {
     background: var(--lib);
     color: white;
 }
+/* ══ NOMINATION ══ */
+.nomination-card {
+    background: linear-gradient(175deg, #2a1a08 0%, #1a0f04 100%);
+    border: 2px solid var(--gold);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.nomination-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.nomination-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: rgba(184, 134, 11, 0.1);
+    border: 1px solid rgba(184, 134, 11, 0.4);
+    color: var(--gold2);
+    font-family: "Cinzel", serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition:
+        background 0.2s,
+        border-color 0.2s;
+}
+
+.nomination-btn:hover {
+    background: rgba(184, 134, 11, 0.25);
+    border-color: var(--gold);
+}
+
+/* ══ VOTING ══ */
+.voting-card {
+    background: linear-gradient(175deg, #1a1a2e 0%, #0f0f1a 100%);
+    border: 2px solid rgba(180, 180, 255, 0.3);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+.voting-candidates {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    padding: 12px 20px;
+    width: 100%;
+}
+
+.voting-candidate {
+    flex: 1;
+    text-align: center;
+}
+
+.voting-candidate-role {
+    font-family: "Cinzel", serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(240, 232, 216, 0.5);
+    margin-bottom: 4px;
+}
+
+.voting-candidate-name {
+    font-family: "Cinzel", serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f0e8d8;
+}
+
+.voting-divider {
+    font-size: 20px;
+    color: rgba(240, 232, 216, 0.3);
+}
+
+.voting-progress {
+    font-family: "Cinzel", serif;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: rgba(240, 232, 216, 0.4);
+    text-transform: uppercase;
+}
+
+.voting-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.vote-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    font-family: "Cinzel", serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition:
+        filter 0.15s,
+        transform 0.15s;
+}
+
+.vote-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.vote-btn:active {
+    transform: translateY(0);
+}
+
+.vote-ja {
+    background: linear-gradient(175deg, var(--lib) 0%, var(--lib-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(58, 143, 168, 0.4);
+}
+
+.vote-nein {
+    background: linear-gradient(175deg, var(--fas) 0%, var(--fas-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(200, 64, 48, 0.4);
+}
+
+/* ══ VOTE RESULT BANNER ══ */
+.vote-result-banner {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 28px;
+    border-radius: 3px;
+    font-family: "Cinzel", serif;
+    animation: fadeUp 0.3s ease;
+}
+
+.vote-passed {
+    background: rgba(30, 100, 80, 0.95);
+    border: 1px solid rgba(60, 200, 140, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.vote-failed {
+    background: rgba(100, 20, 10, 0.95);
+    border: 1px solid rgba(200, 60, 40, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.vote-result-icon {
+    font-size: 20px;
+}
+
+.vote-result-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #f0e8d8;
+}
+
+.vote-result-tally {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: rgba(240, 232, 216, 0.6);
+}
+
+/* ══ DEAD PLAYERS ══ */
+.player-dead {
+    opacity: 0.4;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    box-shadow: none !important;
+}
+
+.player-dead .player-name {
+    text-decoration: line-through;
+    color: rgba(240, 232, 216, 0.3) !important;
+}
+
+.player-dead-label {
+    font-size: 10px;
+    color: rgba(240, 232, 216, 0.3);
+}
+/* ══ POLICY CARDS ══ */
+.policy-card {
+    width: 70px;
+    height: 110px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.policy-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.policy-selected {
+    transform: translateY(-12px) !important;
+    box-shadow: 0 16px 32px rgba(255, 255, 255, 0.2) !important;
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+/* ── Card Back ── */
+.policy-back {
+    background: linear-gradient(160deg, #4a0c08 0%, #2a0604 100%);
+    border: 2px solid rgba(184, 134, 11, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.policy-back-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.policy-back-border {
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(184, 134, 11, 0.4);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(184, 134, 11, 0.03) 4px,
+        rgba(184, 134, 11, 0.03) 8px
+    );
+}
+
+.policy-back-eagle {
+    font-size: 22px;
+    color: rgba(184, 134, 11, 0.7);
+}
+
+.policy-back-text {
+    font-family: "Cinzel", serif;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: rgba(184, 134, 11, 0.5);
+}
+
+/* ── Liberal Card ── */
+.policy-liberal {
+    background: linear-gradient(160deg, #2e7a92 0%, #1a4d5e 100%);
+    border: 2px solid rgba(100, 200, 230, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.policy-liberal .policy-card-border {
+    border-color: rgba(100, 200, 230, 0.3);
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(100, 200, 230, 0.03) 4px,
+        rgba(100, 200, 230, 0.03) 8px
+    );
+}
+
+.policy-liberal .policy-card-emblem {
+    color: rgba(180, 230, 240, 0.9);
+}
+
+.policy-liberal .policy-card-title,
+.policy-liberal .policy-card-subtitle {
+    color: rgba(180, 230, 240, 0.8);
+}
+
+/* ── Fascist Card ── */
+.policy-fascist {
+    background: linear-gradient(160deg, #8a1a10 0%, #4a0c08 100%);
+    border: 2px solid rgba(255, 120, 100, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.policy-fascist .policy-card-border {
+    border-color: rgba(255, 120, 100, 0.3);
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(255, 120, 100, 0.03) 4px,
+        rgba(255, 120, 100, 0.03) 8px
+    );
+}
+
+.policy-fascist .policy-card-emblem {
+    color: rgba(255, 180, 160, 0.9);
+}
+
+.policy-fascist .policy-card-title,
+.policy-fascist .policy-card-subtitle {
+    color: rgba(255, 180, 160, 0.8);
+}
+
+/* ── Card Inner Shared ── */
+.policy-card-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 4px;
+}
+
+.policy-card-border {
+    width: 100%;
+    height: 100%;
+    border: 1px solid;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.policy-card-emblem {
+    font-size: 26px;
+    line-height: 1;
+}
+
+.policy-card-title {
+    font-family: "Cinzel", serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.policy-card-subtitle {
+    font-family: "Cinzel", serif;
+    font-size: 7px;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+}
+
+/* ══ LEGISLATIVE OVERLAY ══ */
+.legislative-card {
+    background: linear-gradient(175deg, #1a1208 0%, #0e0a04 100%);
+    border: 2px solid rgba(184, 134, 11, 0.4);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+    min-width: 360px;
+}
+
+.legislative-cards {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px 0;
+}
+
+.legislative-confirm-btn {
+    background: rgba(184, 134, 11, 0.15);
+    border: 1px solid rgba(184, 134, 11, 0.5);
+    color: var(--gold2);
+    font-size: 12px;
+    padding: 10px 32px;
+    width: auto;
+    letter-spacing: 0.15em;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.legislative-confirm-btn:hover {
+    background: rgba(184, 134, 11, 0.3);
+}
+
+/* ══ PILE COUNT ══ */
+.pile-count {
+    font-family: "Cinzel", serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--lib-text);
+    opacity: 0.7;
+    writing-mode: horizontal-tb;
+    transform: none;
+    margin-top: 4px;
+}
+/* ══ PILE CARD (side label sized) ══ */
+.pile-card-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    writing-mode: horizontal-tb;
+    transform: none;
+}
+
+.pile-card-back {
+    width: 22px;
+    height: 32px;
+    border-radius: 2px;
+    background: linear-gradient(160deg, #4a0c08 0%, #2a0604 100%);
+    border: 1px solid rgba(184, 134, 11, 0.5);
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.pile-card-border {
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    border-radius: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pile-card-eagle {
+    font-size: 8px;
+    color: rgba(184, 134, 11, 0.6);
+}
+
+.pile-card-count {
+    font-family: "Cinzel", serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--lib-text);
+    opacity: 0.7;
+}
 /* ══ ANIMATIONS ══ */
 @keyframes fadeUp {
     from {

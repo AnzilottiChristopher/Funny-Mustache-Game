@@ -23,7 +23,7 @@ class Player {
         this.role = role;
     }
     setLife(life) {
-        this.life = life;
+        this.alive = life;
     }
 
     castVote(vote) {

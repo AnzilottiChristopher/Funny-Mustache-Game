@@ -5,8 +5,8 @@ export default function PasswordModal({ sessionName, onCancel, onJoin }) {
     const [name, setName] = useState("");
 
     function handleJoin() {
-        if (!name || !password) {
-            alert("Both fields must be filled");
+        if (!name) {
+            alert("Please enter your name");
             return;
         }
         onJoin(password, name); // ← pass both

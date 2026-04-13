@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import SessionList from "./SessionList";
 import PasswordModal from "./PasswordModal";
 import socket from "../socket";
@@ -9,9 +9,6 @@ export default function LobbyView({ onEnterBoard }) {
     const [sessionName, setSessionName] = useState("");
     const [createPassword, setCreatePassword] = useState("");
     const [playerName, setPlayerName] = useState("");
-    const [joinName, setJoinName] = useState("");
-    const [playerCount, setPlayerCount] = useState(6);
-    const playerCountRef = useRef(6);
 
     function fetchSessions() {
         socket.emit("getSessions");
@@ -25,7 +22,6 @@ export default function LobbyView({ onEnterBoard }) {
             onEnterBoard({
                 roomName: data.sessionName,
                 isHost: true,
-                playerCount: playerCountRef.current,
                 myId: socket.id,
             });
         });
@@ -35,7 +31,6 @@ export default function LobbyView({ onEnterBoard }) {
             onEnterBoard({
                 roomName: data.sessionName,
                 isHost: false,
-                playerCount: playerCountRef.current,
                 myId: socket.id,
             });
         });
@@ -51,15 +46,9 @@ export default function LobbyView({ onEnterBoard }) {
         };
     }, []);
 
-    function handlePlayerCountChange(e) {
-        const val = Number(e.target.value);
-        setPlayerCount(val);
-        playerCountRef.current = val;
-    }
-
     function handleCreate() {
         if (!sessionName || !playerName) {
-            alert("Session name must be filled");
+            alert("Session name and your name must be filled");
             return;
         }
         socket.emit("createSession", {
@@ -80,10 +69,6 @@ export default function LobbyView({ onEnterBoard }) {
     }
 
     function handleJoin(password, name) {
-        if (!joinName || !password) {
-            alert("Both fields must be filled");
-            return;
-        }
         socket.emit("joinSession", {
             sessionName: selectedSession,
             password,
@@ -148,21 +133,6 @@ export default function LobbyView({ onEnterBoard }) {
                                     />
                                 </div>
 
-                                <div className="field">
-                                    <label>Number of Players</label>
-                                    <select
-                                        value={playerCount}
-                                        onChange={handlePlayerCountChange}
-                                    >
-                                        <option value={5}>5 players</option>
-                                        <option value={6}>6 players</option>
-                                        <option value={7}>7 players</option>
-                                        <option value={8}>8 players</option>
-                                        <option value={9}>9 players</option>
-                                        <option value={10}>10 players</option>
-                                    </select>
-                                </div>
-
                                 <div className="code-reveal">
                                     <label>
                                         Your Room Code — Share with Allies
@@ -224,18 +194,6 @@ export default function LobbyView({ onEnterBoard }) {
                             </div>
 
                             <div className="fields">
-                                <div className="field">
-                                    <label>Your Name</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter your alias…"
-                                        value={joinName}
-                                        onChange={(e) =>
-                                            setJoinName(e.target.value)
-                                        }
-                                    />
-                                </div>
-
                                 <SessionList
                                     sessions={sessions}
                                     onSelect={setSelectedSession}
