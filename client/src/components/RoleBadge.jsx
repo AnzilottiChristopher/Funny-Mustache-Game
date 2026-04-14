@@ -9,6 +9,8 @@ export default function RoleBadge({
     const isHitler = role === "hitler";
     const isSmallGame = playerCount <= 6;
 
+    console.log(hitlerId);
+
     return (
         <div
             className={`role-badge-fixed ${isLiberal ? "role-badge-liberal" : "role-badge-fascist"}`}
@@ -16,7 +18,7 @@ export default function RoleBadge({
             <div className="role-badge-icon">
                 {isLiberal && "🕊"}
                 {isFascist && "⚡"}
-                {isHitler && "☠"}
+                {isHitler && "🥸"}
             </div>
             <div className="role-badge-label">
                 {isLiberal && "Liberal"}
@@ -25,19 +27,25 @@ export default function RoleBadge({
             </div>
 
             {/* Fascist info — fascists always see this */}
-            {isFascist && knownFascists && knownFascists.length > 0 && (
+            {isFascist && (
                 <div className="role-badge-info">
-                    <div className="role-badge-info-label">Fascists</div>
-                    {knownFascists.map((name, i) => (
-                        <div key={i} className="role-badge-info-value">
-                            ⚡ {name}
-                        </div>
-                    ))}
+                    {knownFascists && knownFascists.length > 0 && (
+                        <>
+                            <div className="role-badge-info-label">
+                                Fascists
+                            </div>
+                            {knownFascists.map((name, i) => (
+                                <div key={i} className="role-badge-info-value">
+                                    ⚡ {name}
+                                </div>
+                            ))}
+                        </>
+                    )}
                     {hitlerId && (
                         <>
                             <div className="role-badge-info-label">Hitler</div>
                             <div className="role-badge-info-value">
-                                ☠ {hitlerId}
+                                🥸 {hitlerId}
                             </div>
                         </>
                     )}

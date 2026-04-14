@@ -315,6 +315,41 @@ io.on("connection", (socket) => {
                     });
                 }, 3000);
             } else {
+                if (game.electionTracker >= 4) {
+                    const reshuffled = game.reshuffleIfNeeded();
+                    const chaosCard = game.policyDeck.splice(0, 0);
+
+                    if (chaosCard === "liberal") {
+                        game.liberalPolicies++;
+                    } else {
+                        game.fascistPolicies++;
+                    }
+
+                    game.electionTracker = 1;
+
+                    const winner = game.checkBoard();
+
+                    setTimeout(() => {
+                        if (winner) {
+                            io.to(sessionName).emit("gameOver", {
+                                winner,
+                                roles: game.getRoles(),
+                                publicState: game.getPublicState(),
+                            });
+                            return;
+                        }
+
+                        io.to(sessionName).emit("policyEnacted", {
+                            policy: chaosCard,
+                            chaos: true,
+                            publicState: game.getPublicState(),
+                        });
+
+                        setTimeout(() => {
+                            startDeliberation(sessionName, game);
+                        }, 3000);
+                    }, 3000);
+                }
                 setTimeout(() => {
                     startDeliberation(sessionName, game);
                 }, 3000);
@@ -378,43 +413,6 @@ io.on("connection", (socket) => {
                 publicState: game.getPublicState(),
             });
             return;
-        }
-
-        if (game.electionTracker >= 4) {
-            const { cards: chaosDraw } = game.drawCards();
-            const chaosPolicy = chaosDraw[0];
-            game.discardPile.push(chaosDraw[1], chaosDraw[2]);
-
-            if (chaosPolicy === "liberal") {
-                game.liberalPolicies++;
-            } else {
-                game.fascistPolicies++;
-            }
-            game.electionTracker = 1;
-            game.lastElectedPresident = null;
-            game.lastElectedChancellor = null;
-
-            const chaosWinner = game.checkBoard();
-            if (chaosWinner) {
-                io.to(sessionName).emit("gameOver", {
-                    winner: chaosWinner,
-                    roles: game.getRoles(),
-                    publicState: game.getPublicState(),
-                });
-                return;
-            }
-
-            io.to(sessionName).emit("policyEnacted", {
-                policy: chaosPolicy,
-                chaos: true,
-                publicState: game.getPublicState(),
-            });
-        } else {
-            io.to(sessionName).emit("policyEnacted", {
-                policy: enacted,
-                chaos: false,
-                publicState: game.getPublicState(),
-            });
         }
 
         setTimeout(() => {

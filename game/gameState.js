@@ -89,10 +89,8 @@ class GameManager {
 
         return alivePlayers.filter((id) => {
             if (id === presidentId) return false; // can't nominate yourself
-            if (!ignoreLimits) {
-                if (id === this.lastElectedPresident) return false;
-                if (id === this.lastElectedChancellor) return false;
-            }
+            if (id === this.lastElectedChancellor) return false;
+            if (!ignoreLimits && id === this.lastElectedPresident) return false;
             return true;
         });
     }
@@ -343,8 +341,8 @@ class GameManager {
 
     chancellorEnact(cardIndex, remainingCards) {
         // cardIndex is which of the 2 cards the chancellor discards
-        const discarded = remainingCards[cardIndex];
-        const enacted = remainingCards.find((_, i) => i !== cardIndex);
+        const enacted = remainingCards[cardIndex];
+        const discarded = remainingCards.find((_, i) => i !== cardIndex);
         this.discardPile.push(discarded);
 
         if (enacted === "liberal") {
@@ -353,7 +351,7 @@ class GameManager {
             this.fascistPolicies++;
         }
 
-        this.phase = Phases.NOMINATION;
+        // this.phase = Phases.NOMINATION;
         return enacted;
     }
 }

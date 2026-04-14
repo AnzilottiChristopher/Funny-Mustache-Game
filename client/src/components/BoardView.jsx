@@ -28,6 +28,7 @@ export default function BoardView({
     const [votedPlayers, setVotedPlayers] = useState([]);
     const [hasVoted, setHasVoted] = useState(false);
     const [voteResult, setVoteResult] = useState(null);
+    const [revealedVotes, setRevealedVotes] = useState(null);
     const [eligibleChancellors, setEligibleChancellors] = useState([]);
     const [legislativeCards, setLegislativeCards] = useState(null);
     const [awaitingChancellor, setAwaitingChancellor] = useState(false);
@@ -39,6 +40,7 @@ export default function BoardView({
     const [skipCount, setSkipCount] = useState(0);
     const [hasSkipped, setHasSkipped] = useState(false);
     const [skipCountdown, setSkipCountdown] = useState(null);
+    const [overlaysHidden, setOverlaysHidden] = useState(false);
 
     useEffect(() => {
         socket.on("roleAssigned", (data) => {
@@ -67,9 +69,9 @@ export default function BoardView({
         socket.on("voteResult", ({ passed, ja, nein, votes, publicState }) => {
             onPublicStateUpdate(publicState);
             setVoteResult({ passed, ja, nein, votes });
+            setRevealedVotes(votes);
             setVotedPlayers([]);
             setHasVoted(false);
-            setTimeout(() => setVoteResult(null), 3000);
         });
 
         socket.on("nominationPhase", ({ publicState, eligibleIds }) => {
@@ -79,10 +81,10 @@ export default function BoardView({
             );
             onPublicStateUpdate(publicState);
             setEligibleChancellors(eligibleIds);
-            setVoteResult(null);
             setLegislativeCards(null);
             setChancellorCards(null);
             setAwaitingChancellor(false);
+            setOverlaysHidden(false);
         });
 
         socket.on("deliberationEnded", () => {
@@ -90,6 +92,8 @@ export default function BoardView({
             setDeliberating(false);
             setSkipCountdown(null);
             setHasSkipped(false);
+            setVoteResult(null);
+            setRevealedVotes(null);
         });
 
         socket.on("legislativeSession", ({ cards, reshuffled }) => {
@@ -101,6 +105,8 @@ export default function BoardView({
             onPublicStateUpdate(publicState);
             if (reshuffled) setReshuffled(true);
             setAwaitingChancellor(false);
+            setVoteResult(null);
+            setTimeout(() => setRevealedVotes(null), 5000); // ← delay clearing
         });
 
         socket.on("presidentDiscarded", ({ publicState }) => {
@@ -120,21 +126,22 @@ export default function BoardView({
             setLegislativeCards(null);
             setAwaitingChancellor(false);
             setPolicyResult({ policy, chaos });
+            setRevealedVotes(null);
             onPublicStateUpdate(publicState);
-            setTimeout(() => setPolicyResult(null), 3000);
+            setTimeout(() => {
+                setPolicyResult(null);
+                setRevealedVotes(null); // ← clear together with policy banner
+            }, 3000);
         });
 
         socket.on("deliberationPhase", ({ timeLimit, publicState }) => {
-            console.log(
-                "CLIENT: deliberationPhase received, timeLimit:",
-                timeLimit,
-            );
             onPublicStateUpdate(publicState);
             setDeliberating(true);
             setDeliberationTimeLimit(timeLimit);
             setSkipCount(0);
             setHasSkipped(false);
             setSkipCountdown(null);
+            setOverlaysHidden(false);
         });
 
         socket.on("skipVoteUpdate", ({ skipCount, aliveCount, voterId }) => {
@@ -288,7 +295,8 @@ export default function BoardView({
                 isNominating &&
                 !showRole &&
                 !voteResult &&
-                !deliberating && (
+                !deliberating &&
+                !overlaysHidden && (
                     <NominationOverlay
                         players={players}
                         eligibleIds={eligibleChancellors}
@@ -299,20 +307,24 @@ export default function BoardView({
                 )}
 
             {/* ── VOTING OVERLAY ── */}
-            {gameStarted && isVoting && !showRole && !voteResult && (
-                <VotingOverlay
-                    presidentName={presidentName}
-                    chancellorName={chancellorName}
-                    myId={myId}
-                    alivePlayers={publicState?.alivePlayers || []}
-                    votedPlayers={votedPlayers}
-                    hasVoted={hasVoted}
-                    onVote={handleVote}
-                />
-            )}
+            {gameStarted &&
+                isVoting &&
+                !showRole &&
+                !voteResult &&
+                !overlaysHidden && (
+                    <VotingOverlay
+                        presidentName={presidentName}
+                        chancellorName={chancellorName}
+                        myId={myId}
+                        alivePlayers={publicState?.alivePlayers || []}
+                        votedPlayers={votedPlayers}
+                        hasVoted={hasVoted}
+                        onVote={handleVote}
+                    />
+                )}
 
             {/* ── LEGISLATIVE OVERLAY ── */}
-            {showLegislative && (
+            {showLegislative && !overlaysHidden && (
                 <LegislativeOverlay
                     cards={legislativeCards || chancellorCards || []}
                     isPresident={isPresident && !!legislativeCards}
@@ -332,6 +344,16 @@ export default function BoardView({
                     countdownSeconds={skipCountdown}
                     onSkip={handleSkipVote}
                 />
+            )}
+
+            {/* ── TOGGLE OVERLAYS BUTTON ── */}
+            {gameStarted && !deliberating && !showRole && (
+                <button
+                    className="toggle-overlays-btn"
+                    onClick={() => setOverlaysHidden((prev) => !prev)}
+                >
+                    {overlaysHidden ? "Show Overlay" : "Hide Overlay"}
+                </button>
             )}
 
             {/* ── START GAME BUTTON (host only, before game starts) ── */}
@@ -355,10 +377,7 @@ export default function BoardView({
                     myId={myId}
                     alivePlayers={publicState?.alivePlayers || []}
                     votedPlayers={votedPlayers}
-                    role={role}
-                    knownFascistIds={knownFascistIds}
-                    hitlerSocketId={hitlerSocketId}
-                    playerCount={publicState?.playerCount || 0}
+                    revealedVotes={revealedVotes}
                 />
             )}
 

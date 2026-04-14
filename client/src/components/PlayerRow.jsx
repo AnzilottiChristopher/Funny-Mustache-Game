@@ -5,32 +5,8 @@ export default function PlayerRow({
     myId,
     alivePlayers,
     votedPlayers,
-    role,
-    knownFascistIds,
-    hitlerSocketId,
-    playerCount,
+    revealedVotes,
 }) {
-    const isFascist = role === "fascist";
-    const isHitler = role === "hitler";
-    const isSmallGame = playerCount <= 6;
-
-    function getFascistIcon(playerId) {
-        if (playerId === myId) return null;
-
-        if (isFascist) {
-            if (knownFascistIds && knownFascistIds.includes(playerId))
-                return "⚡";
-            if (hitlerSocketId && hitlerSocketId === playerId) return "☠";
-        }
-
-        if (isHitler && isSmallGame) {
-            if (knownFascistIds && knownFascistIds.includes(playerId))
-                return "⚡";
-        }
-
-        return null;
-    }
-
     return (
         <div className="player-row">
             {players.map((player) => {
@@ -41,7 +17,7 @@ export default function PlayerRow({
                     alivePlayers && !alivePlayers.includes(player.id);
                 const hasVoted =
                     votedPlayers && votedPlayers.includes(player.id);
-                const fascistIcon = getFascistIcon(player.id);
+                const revealedVote = revealedVotes?.[player.id];
 
                 return (
                     <div
@@ -66,13 +42,17 @@ export default function PlayerRow({
                                 C
                             </div>
                         )}
-                        {hasVoted && !isDead && (
+                        {revealedVotes &&
+                            revealedVote !== undefined &&
+                            !isDead && (
+                                <div
+                                    className={`player-badge ${revealedVote ? "vote-ja-badge" : "vote-nein-badge"}`}
+                                >
+                                    {revealedVote ? "Ja" : "Nein"}
+                                </div>
+                            )}
+                        {!revealedVotes && hasVoted && !isDead && (
                             <div className="player-badge voted-badge">✓</div>
-                        )}
-                        {fascistIcon && (
-                            <div className="player-faction-icon">
-                                {fascistIcon}
-                            </div>
                         )}
                         <div className="player-name">{player.name}</div>
                         {isMe && <div className="player-you">you</div>}
